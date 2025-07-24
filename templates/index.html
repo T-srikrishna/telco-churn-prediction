@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telco Churn Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Telco Customer Churn Prediction</h1>
+        <form id="churnForm">
+            <div class="form-grid">
+                <!-- Visible Inputs -->
+                <div class="form-group">
+                    <label for="tenure">Tenure (Months)</label>
+                    <input type="number" id="tenure" name="tenure" value="10" required>
+                </div>
+                <div class="form-group">
+                    <label for="MonthlyCharges">Monthly Charges ($)</label>
+                    <input type="number" step="0.01" id="MonthlyCharges" name="MonthlyCharges" value="75.50" required>
+                </div>
+                <div class="form-group">
+                    <label for="Contract">Contract Type</label>
+                    <select id="Contract" name="Contract">
+                        <option value="Month-to-month" selected>Month-to-month</option>
+                        <option value="One year">One year</option>
+                        <option value="Two year">Two year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="InternetService">Internet Service</label>
+                    <select id="InternetService" name="InternetService">
+                        <option value="DSL">DSL</option>
+                        <option value="Fiber optic" selected>Fiber optic</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <!-- NEW VISIBLE INPUTS -->
+                <div class="form-group">
+                    <label for="OnlineSecurity">Online Security</label>
+                    <select id="OnlineSecurity" name="OnlineSecurity">
+                        <option value="No" selected>No</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No internet service">No internet service</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="TechSupport">Tech Support</label>
+                    <select id="TechSupport" name="TechSupport">
+                        <option value="No" selected>No</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No internet service">No internet service</option>
+                    </select>
+                </div>
+
+                 <!-- Hidden fields with defaults for the rest -->
+                 <input type="hidden" name="gender" value="Female">
+                 <input type="hidden" name="SeniorCitizen" value="0">
+                 <input type="hidden" name="Partner" value="No">
+                 <input type="hidden" name="Dependents" value="No">
+                 <input type="hidden" name="PhoneService" value="Yes">
+                 <input type="hidden" name="MultipleLines" value="No">
+                 <input type="hidden" name="OnlineBackup" value="No">
+                 <input type="hidden" name="DeviceProtection" value="No">
+                 <input type="hidden" name="StreamingTV" value="No">
+                 <input type="hidden" name="StreamingMovies" value="No">
+                 <input type="hidden" name="PaperlessBilling" value="Yes">
+                 <input type="hidden" name="PaymentMethod" value="Electronic check">
+                 <input type="hidden" name="TotalCharges" value="750.50">
+            </div>
+            <button type="submit">Predict Churn</button>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <!-- The JavaScript part remains exactly the same -->
+    <script>
+        document.getElementById('churnForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('/predict_api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultDiv = document.getElementById('result');
+                if (result.error) {
+                    resultDiv.textContent = `Error: ${result.error}`;
+                    resultDiv.className = 'result churn-yes';
+                } else {
+                    resultDiv.textContent = `Prediction: ${result.prediction} (Probability: ${result.churn_probability}%)`;
+                    resultDiv.className = (result.prediction === 'Churn') ? 'result churn-yes' : 'result churn-no';
+                }
+                resultDiv.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('result');
+                resultDiv.textContent = 'An error occurred. Please check the console.';
+                resultDiv.className = 'result churn-yes';
+                resultDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
