@@ -1,19 +1,18 @@
 # Telco Customer Churn Prediction
 
-This project develops a machine learning model to predict customer churn for a telecommunications company. It includes a full data analysis pipeline in a Jupyter Notebook and a web application built with Flask that uses the trained model to make real-time predictions.
+This project builds a machine learning model to predict customer churn for a telecommunications company. It features a complete data analysis pipeline in a Jupyter Notebook and a Flask web application for real-time predictions.
 
-
-![Telco Churn Predictor Web Application](screenshots/web.png)
+![Web Application Screenshot](screenshots/web.png)
 
 ## Project Objective
 
-Customer churn is a major concern for telecommunications companies, as acquiring new customers is significantly more expensive than retaining existing ones. The goal of this project is to build a highly accurate model that predicts which customers are likely to churn. This allows the business to take proactive measures, such as offering targeted promotions, to reduce revenue loss and improve customer loyalty.
+Customer churn is a major challenge for telecom companies, as retaining customers is more cost-effective than acquiring new ones. The goal is to develop an accurate, interpretable model to identify customers likely to churn, enabling proactive retention strategies.
 
 ## Features
 
--   **Detailed Exploratory Data Analysis (EDA):** The `Project_Report.ipynb` notebook contains a comprehensive analysis of the customer data, uncovering key factors that influence churn.
--   **Machine Learning Model Pipeline:** A robust `scikit-learn` pipeline was built to handle data preprocessing (scaling, encoding), class imbalance (using SMOTE), and model training.
--   **Interactive Web Application:** A web interface built with **Flask** allows users to input customer data and receive an instant churn prediction, demonstrating the model's real-world applicability.
+- **Exploratory Data Analysis (EDA):** Comprehensive analysis in `Project_Report.ipynb` to uncover key churn factors.
+- **Robust ML Pipeline:** Data preprocessing (scaling, encoding), class imbalance handling (SMOTE), and hyperparameter tuning for multiple models.
+- **Interactive Web App:** Flask-based interface for instant churn predictions using new customer data.
 
 ## Project Structure
 
@@ -24,7 +23,7 @@ Customer churn is a major concern for telecommunications companies, as acquiring
 ├── templates/
 │   └── index.html
 ├── Project_Report.ipynb
-├── Telco-Customer-Churn.csv
+├── WA_Fn-UseC_-Telco-Customer-Churn.csv
 ├── app.py
 ├── churn_model.joblib
 ├── requirements.txt
@@ -33,33 +32,32 @@ Customer churn is a major concern for telecommunications companies, as acquiring
 
 ## Technology Stack
 
--   **Backend:** Python, Flask
--   **Frontend:** HTML, CSS
--   **Data Science & ML:** Pandas, NumPy, Scikit-learn, Imbalanced-learn, Joblib
--   **Data Visualization:** Matplotlib, Seaborn
+- **Backend:** Python, Flask
+- **Frontend:** HTML, CSS
+- **Data Science & ML:** Pandas, NumPy, Scikit-learn, Imbalanced-learn, XGBoost, LightGBM, Joblib
+- **Visualization:** Matplotlib, Seaborn
 
 ## Setup and Installation
 
-Follow these steps to set up and run the project locally.
-
-1.  **Clone the repository:**
+1. **Clone the repository:**
     ```bash
     git clone https://github.com/T-srikrishna/telco-churn-prediction.git
     cd telco-churn-prediction
     ```
 
-2.  **Create and activate a virtual environment:**
-    ```bash
-    # For Windows
-    python -m venv venv
-    venv\Scripts\activate
+2. **Create and activate a virtual environment:**
+    - *Windows:*
+      ```bash
+      python -m venv venv
+      .\venv\Scripts\activate
+      ```
+    - *macOS/Linux:*
+      ```bash
+      python3 -m venv venv
+      source venv/bin/activate
+      ```
 
-    # For macOS/Linux
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-
-3.  **Install the required dependencies:**
+3. **Install dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
@@ -68,9 +66,7 @@ Follow these steps to set up and run the project locally.
 
 ### 1. Run the Web Application
 
-The repository includes a pre-trained model (`churn_model.joblib`), so you can run the web application directly.
-
-From the project's root directory, run the Flask app:
+A pre-trained model (`churn_model.joblib`) is included. Start the Flask app from the project root:
 
 ```bash
 flask run
@@ -80,21 +76,22 @@ or
 python app.py
 ```
 
-Open your web browser and navigate to `http://127.0.0.1:5000`. You can now input customer details into the form and click "Predict Churn" to get a result.
+Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) to input customer details and predict churn.
 
-### 2. Explore the Analysis & Model Training
+### 2. Explore Analysis & Model Training
 
-To see the full data analysis, model training, and evaluation process, you can run the Jupyter Notebook:
+Run the Jupyter Notebook for full data analysis and model training:
+
 ```bash
-jupyter notebook "Project_Report.ipynb"
+jupyter notebook Project_Report.ipynb
 ```
 
 ## Final Model Details
 
-The champion model selected for this project is a **Tuned Logistic Regression** model. It was chosen for three key reasons:
+The selected model is a **Tuned Logistic Regression**, chosen after evaluating five algorithms (Random Forest, XGBoost, LightGBM, Neural Network):
 
-1.  **Highest Recall (79.7%):** It was the best model at identifying customers who will actually churn. For a retention campaign, it is far more costly to miss a potential churner (a false negative) than it is to mistakenly target a loyal customer (a false positive).
-2.  **High Interpretability:** Its linear nature makes it easy to understand and explain which factors (e.g., contract type, monthly charges) are influencing the predictions.
-3.  **Simplicity and Speed:** It is computationally efficient, making it fast to train and deploy.
+- **Highest Recall (79.7%):** It was the best model at identifying customers who will actually churn. For a retention campaign, it is far more costly to miss a potential churner (a false negative) than it is to mistakenly target a loyal customer (a false positive).
+- **High Interpretability:** Its linear nature makes it easy to understand and explain which factors (e.g., contract type, monthly charges) are influencing the predictions, a crucial feature for business stakeholders.
+- **Simplicity and Efficiency:** It is computationally efficient, making it fast to train and easy to deploy.
 
-The model was trained using a full pipeline incorporating data preprocessing (StandardScaler for numerical features, OneHotEncoder for categorical features) and SMOTE (Synthetic Minority Over-sampling Technique) to effectively handle the class imbalance in the dataset.
+The model was trained using a full pipeline incorporating data preprocessing (`StandardScaler` for numerical features, `OneHotEncoder` for categorical features) and SMOTE (Synthetic Minority Over-sampling Technique) to effectively handle the class imbalance in the dataset.
