@@ -3,7 +3,7 @@
 This project develops a machine learning model to predict customer churn for a telecommunications company. It includes a full data analysis pipeline in a Jupyter Notebook and a web application built with Flask that uses the trained model to make real-time predictions.
 
 
-*(Note: You should replace this with a screenshot of your own running application!)*
+![Telco Churn Predictor Web Application](screenshots/web.png)
 
 ## Project Objective
 
