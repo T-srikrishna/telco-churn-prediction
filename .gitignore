@@ -22,3 +22,17 @@ __pycache__/
 # OS-generated files
 .DS_Store
 Thumbs.db
+
+# Uploaded files (keep template but ignore user uploads)
+uploads/*.csv
+uploads/*.xlsx
+uploads/*.xls
+!uploads/.gitkeep
+!uploads/predictions_churn_prediction_template.csv
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp

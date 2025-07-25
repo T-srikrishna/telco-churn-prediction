@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Churn Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #0056b3;
+            background-color: #e9ecef;
+        }
+        
+        .upload-area.dragover {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .upload-btn:hover {
+            background: #0056b3;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .risk-high { border-left-color: #dc3545; }
+        .risk-medium { border-left-color: #ffc107; }
+        .risk-low { border-left-color: #28a745; }
+        
+        .download-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .download-btn:hover {
+            background: #218838;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info-section {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Bulk Customer Churn Prediction</h1>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/" style="display: inline-block; padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">← Back to Single Prediction</a>
+            <a href="/analytics" style="display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">📊 Analytics Dashboard</a>
+            <a href="/sample_template" style="display: inline-block; padding: 10px 20px; background: #17a2b8; color: white; text-decoration: none; border-radius: 5px;">📥 Download Template</a>
+        </div>
+        
+        <div class="info-section">
+            <h3>ℹ️ How to Use Bulk Prediction</h3>
+            <ol>
+                <li><strong>Prepare your data:</strong> Download the sample template or prepare your CSV/Excel file with customer data</li>
+                <li><strong>Upload file:</strong> Drag and drop or click to select your file (CSV or Excel format)</li>
+                <li><strong>Get predictions:</strong> Our AI model will predict churn risk for all customers</li>
+                <li><strong>Download results:</strong> Get a new file with predictions, probabilities, and risk levels</li>
+            </ol>
+            <p><strong>Supported formats:</strong> CSV (.csv), Excel (.xlsx, .xls) | <strong>Max file size:</strong> 16MB</p>
+        </div>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <h3>Upload Customer Data File</h3>
+            <p>Drag and drop your CSV or Excel file here, or click to browse</p>
+            <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click();">
+                Choose File
+            </button>
+            <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls">
+            <div id="fileName" style="margin-top: 10px; font-weight: bold; color: #333;"></div>
+        </div>
+        
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        
+        <div id="resultsSection" class="results-section">
+            <h2>🎯 Prediction Results</h2>
+            <div id="summaryCards" class="summary-grid"></div>
+            <div id="downloadSection" style="text-align: center; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            // Validate file type
+            const allowedTypes = ['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            const allowedExtensions = ['csv', 'xlsx', 'xls'];
+            
+            if (!allowedExtensions.includes(fileExtension)) {
+                showError('Please upload a CSV or Excel file (.csv, .xlsx, .xls)');
+                return;
+            }
+            
+            if (file.size > 16 * 1024 * 1024) { // 16MB limit
+                showError('File size must be less than 16MB');
+                return;
+            }
+            
+            fileName.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            hideError();
+            uploadFile(file);
+        }
+        
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Show progress bar
+            progressBar.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            // Simulate progress (since we can't get real upload progress easily)
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 200);
+            
+            fetch('/bulk_predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    
+                    if (data.error) {
+                        showError(data.error);
+                        if (data.required_columns) {
+                            const columnsList = data.required_columns.join(', ');
+                            showError(data.error + '<br><br><strong>Required columns:</strong><br>' + columnsList);
+                        }
+                    } else {
+                        showResults(data);
+                    }
+                }, 500);
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                progressBar.style.display = 'none';
+                console.error('Error:', error);
+                showError('An error occurred while processing the file. Please try again.');
+            });
+        }
+        
+        function showResults(data) {
+            const summaryCards = document.getElementById('summaryCards');
+            const downloadSection = document.getElementById('downloadSection');
+            
+            // Create summary cards
+            summaryCards.innerHTML = `
+                <div class="summary-card">
+                    <h4>Total Customers</h4>
+                    <div class="value">${data.summary.total_customers.toLocaleString()}</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Predicted Churners</h4>
+                    <div class="value" style="color: #dc3545;">${data.summary.predicted_churners.toLocaleString()}</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Churn Rate</h4>
+                    <div class="value" style="color: #dc3545;">${data.summary.predicted_churn_rate}</div>
+                </div>
+                <div class="summary-card risk-high">
+                    <h4>High Risk</h4>
+                    <div class="value">${data.summary.risk_distribution['High Risk'] || 0}</div>
+                </div>
+                <div class="summary-card risk-medium">
+                    <h4>Medium Risk</h4>
+                    <div class="value">${data.summary.risk_distribution['Medium Risk'] || 0}</div>
+                </div>
+                <div class="summary-card risk-low">
+                    <h4>Low Risk</h4>
+                    <div class="value">${data.summary.risk_distribution['Low Risk'] || 0}</div>
+                </div>
+            `;
+            
+            // Create download section
+            downloadSection.innerHTML = `
+                <h3>📥 Download Results</h3>
+                <p>${data.message}</p>
+                <a href="${data.download_url}" class="download-btn">
+                    📊 Download Predictions File
+                </a>
+                <br><br>
+                <small>The downloaded file includes all original data plus: Churn_Prediction, Churn_Probability, and Risk_Level columns</small>
+            `;
+            
+            resultsSection.style.display = 'block';
+        }
+        
+        function showError(message) {
+            errorMessage.innerHTML = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
