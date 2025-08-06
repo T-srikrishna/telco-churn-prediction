@@ -257,10 +257,10 @@ def predict_api():
 def model_info():
     """Get information about the loaded model"""
     if model is None:
-        return jsonify({"error": "Model not loaded"}), 500
+        return render_template('error.html', error="Model not loaded"), 500
     
     try:
-        model_info = {
+        model_data = {
             "model_type": "Tuned Logistic Regression with SMOTE",
             "features": [
                 "tenure", "MonthlyCharges", "TotalCharges", "SeniorCitizen",
@@ -277,9 +277,9 @@ def model_info():
             },
             "description": "Best model for identifying customers likely to churn"
         }
-        return jsonify(model_info)
+        return render_template('model_info.html', model_data=model_data)
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return render_template('error.html', error=str(e)), 400
 
 @app.route('/bulk_predict', methods=['GET', 'POST'])
 def bulk_predict():
